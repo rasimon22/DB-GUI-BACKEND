@@ -1,11 +1,12 @@
 USE myplaylist;
 CREATE TABLE users (user_id int AUTO_INCREMENT,
 username varchar(255), password varchar(255),
-fName varchar(255), lName varchar(255), email varchar(255),
+fName varchar(255), lName varchar(255), email varchar(255), 'date' TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+guestBool boolean,
 PRIMARY KEY(user_id));
 
 CREATE TABLE playlists(playlist_id int AUTO_INCREMENT, title varchar(255),
-user_id int NOT NULL, access_code int NOT NULL, PRIMARY KEY(playlist_id));
+user_id int NOT NULL, access_code int NOT NULL,isPublic boolean, PRIMARY KEY(playlist_id));
 
 CREATE TABLE access(access_id int AUTO_INCREMENT, user_id int NOT NULL,
 access_code int NOT NULL, PRIMARY KEY(access_id), FOREIGN KEY(user_id) REFERENCES users(user_id));
