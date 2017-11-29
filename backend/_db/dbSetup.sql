@@ -1,7 +1,7 @@
 USE myplaylist;
 CREATE TABLE users (user_id int AUTO_INCREMENT,
 username varchar(255), password varchar(255),
-fName varchar(255), lName varchar(255), email varchar(255), 'date' TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+fName varchar(255), lName varchar(255), email varchar(255), date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 guestBool boolean,
 PRIMARY KEY(user_id));
 
