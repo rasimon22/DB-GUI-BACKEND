@@ -35,8 +35,7 @@ class ClassUsers
         return count($results)> 0 ? true : false;
     }
 
-    public function register($user,$pass, $firstName, $lastName, $email) {
-        $pass = md5($pass); 
+    public function register($user,$pass, $firstName, $lastName, $email) { 
 
         $sql = "insert into users
             (username, password, fName, lName, email) values

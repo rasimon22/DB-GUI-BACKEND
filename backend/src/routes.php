@@ -31,11 +31,36 @@ $app->post('/register', function (Request $request, Response $response, array $a
     $lName = $userData["lastName"];
     $email = $userData["email"];
     $user = new ClassUsers($this->db);
+	if($username == "" || $pass == "" || $fName == "" || $lName == "" || $email == ""){
+                $false = array('success' => false , 'error' => 'blank input');
+                $response = $response->withJSON(json_encode($false));
+                //$response = $response->withRedirect('/register');
+                return $response;
+       }
+	$pass = md5($pass);
+	$sql = "SELECT count(*)
+            from users WHERE username = '$username'";
+        $stmt = $this->db->query($sql);
+        $results = $stmt->fetch();
+        if($results['count(*)'] > 0){
+                if(session_id() == ''){session_start();}
+                $false = array('success' => false , 'error' => 'username taken');
+                $response = $response->withJSON(json_encode($false));
+                //$response = $response->withRedirect('/register');
+                return $response;
+        }
     $returnData = $user->register($username, $pass, $fName, $lName, $email);
-    if($returnData["valid"] == true){
-    return $response->withJson($returnData,200, JSON_UNESCAPED_UNICODE);
-    }
-   });
+	$sql = $sql = "SELECT user_id
+            from users WHERE username = '$username' AND password = '$pass'";
+	 $stmt = $this->db->query($sql);
+        $results = [];
+        while($row = $stmt->fetch()) {
+            $results[] = $row;
+        }
+        $myJSON = json_encode(array($results));
+	$response = $response->withJSON($myJSON);
+	return $response;
+});
 
 $app->put('/changePassword', function(Request $request, Response $response, array $args){
 //TODO: fix error handling from status 405 to status 418

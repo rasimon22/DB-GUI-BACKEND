@@ -3,9 +3,9 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 
 require __DIR__ . '/../vendor/autoload.php';
-require __DIR__ . '/../classes/ClassVideos.php';
-require __DIR__ . '/../classes/ClassUsers.php';
-require __DIR__ . '/../classes/ClassUsersLikeVideos.php';
+//require __DIR__ . '/../classes/ClassVideos.php';
+//require __DIR__ . '/../classes/ClassUsers.php';
+//require __DIR__ . '/../classes/ClassUsersLikeVideos.php';
 
 
 $app->get('/login', function (Request $request, Response $response, array $args) {
@@ -16,21 +16,35 @@ $app->get('/login', function (Request $request, Response $response, array $args)
 $app->post('/login', function (Request $request, Response $response, array $args) {
     $json = $request->getBody();
     $mydata = json_decode($json,true);
+    $user_id = $mydata["user_id"];    
     $username = $mydata["username"];
     $pass = $mydata["password"];
+	if(!isset($username) || !isset($pass)){
+		$false = array('success' => false , 'error' => 'blank input');
+		$response = $response->withJSON(json_encode($false));
+		$response = $response->withRedirect('/login');
+		return $response;
+	}
+	echo "past blank check";
     $pass = md5($pass);
-      $sql = "SELECT user_id
+      $sql = "SELECT count(*)
             from users WHERE username = '$username' AND password = '$pass'";
         $stmt = $this->db->query($sql);
-
-        $results = [];
+	$results = $stmt->fetch();
+        if($results['count(*)'] == 0){
+        	if(session_id() == ''){session_start();}
+        	$false = array('success' => false , 'error' => 'invalid login');
+                $response = $response->withJSON(json_encode($false));
+                $response = $response->withRedirect('/login');
+                return $response;
+        }
+	echo "past doesnt exist check";
+	 $sql = "SELECT user_id
+            from users WHERE username = '$username' AND password = '$pass'";
+        $stmt = $this->db->query($sql);
+	$results = [];
         while($row = $stmt->fetch()) {
             $results[] = $row;
-        }
-    $url = " ";
-        if(count($results)> 0 ? true : false){
-        if(session_id() == ''){session_start();}
-        $url = "/";
         }
         $myJSON = json_encode(array($results));
         $response = $response->withRedirect('/');       
@@ -47,18 +61,18 @@ $app->get('/addvideos', function (Request $request, Response $response) {
     return $response;
 });
 
-$app->post('/addvideos', function (Request $request, Response $response) {
+/*$app->post('/addvideos', function (Request $request, Response $response) {
         $data = $request->getBody();
         $data = json_decode($data,true);
         $title = $data["title"];
         $link = $data["link"];
-        $classvideos = new ClassVideos($this->db);
-        $addvideo =  $classvideos->AddNewVideo($title, $link);
+        $classvideoss = new ClassVideos($this->db);
+        $addvideo =  $classvideoss->AddNewVideo($title, $link);
         $JSON = json_encode(array("title" => $title, "link" => $link));
         $response =  $response->withJSON($JSON);
         $response =  $response->withRedirect("/");
         return $response;
-});
+});*/
 
 $app->get('/active/{id}', function ( Request $request, Response $response, array $args) {
         $active_id = (int)$args['id'];
@@ -202,4 +216,70 @@ $app->post('/user/{id}', function( Request $request, Response $response, array $
         $this->db->query($sql);
         $response = $response->withJSON($json);
 });
+
+//copied from stackoverflow: https://stackoverflow.com/questions/6101956/generating-a-random-password-in-php
+//by Neal:  https://stackoverflow.com/users/561731/neal
+function randomCode() {
+    $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+    $pass = array(); //remember to declare $pass as an array
+    $alphaLength = strlen($alphabet) - 1; //put the length -1 in cache
+    for ($i = 0; $i < 8; $i++) {
+        $n = rand(0, $alphaLength);
+        $pass[] = $alphabet[$n];
+    }
+    return implode($pass); //turn the array into a string
+}
+ function getNewCode($dbObj){
+        $access_code = randomCode();
+        $sql = "SELECT count(*) FROM access WHERE access_code = '$access_code';";
+        $stmt = $dbObj->db->query($sql);
+
+        $results = [];
+        while($row = $stmt->fetch()) {
+            $results[] = $row;
+        }
+        if(count($results)> 0 ? true : false){
+        getNewCode();
+        }
+        return $access_code;
+}
+
+/*$app->post('/playlist', function( Request $request, Response $response, array $args){
+	$json = $request->getBody();
+	$mydata = json_decode($json,true);
+	$user_id = $mydata["user_id"];
+	$title = $mydata["title"];
+	$public = $mydata["public"];
+ 	$test = true;
+	$access_code;
+	while($test){
+		$access_code = randomCode();
+	 	$sql = "SELECT count(*) FROM access WHERE access_code = '$access_code';";
+        	$stmt = $this->db->query($sql);
+        	$results = $stmt->fetch();
+        	if($results['count(*)'] == 0){
+			$test = false;
+        	}
+	}
+	echo $access_code;
+	/*$sql = "INSERT INTO playlists (title,user_id,access_code,public) 
+		VALUES ('$title', '$user_id', '$access_code', '$public');";
+	$this->db->query($sql);
+	$sql = "INSERT INTO access (user_id, access_code) VALUES ('$user_id','$access_code');";
+	$this->db->query($sql);
+	$sql = "SELECT playlist_id FROM playlists WHERE user_id = '$user_id' AND title = '$title' AND access_code = '$access_code';";
+	$stmt = $this->db->prepare($sql);
+	$stmt->execute();
+	$row = $stmt->fetchObject();
+	$data = array('user_id' => $user_id, 'title' => $title, 'public' => $public, 'access_code' => $access_code,'playlist_id' => $row);
+	$response = $response->withJSON(json_encode($data));
+	$response = $response->withRedirect('/playlist/' + $row);
+	return $response;      
+});*/
+
+
+
+
+
+
 
