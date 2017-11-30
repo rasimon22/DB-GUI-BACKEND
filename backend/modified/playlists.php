@@ -22,18 +22,20 @@ $app->get('/user/playlist/[{uid}]', function (Request $request, Response $respon
 		return $this->response->withJson($row);
 });
 // Retrieve playlist with id 
-$app->get('/playlist/{id}', function(Request $request, Response $response, array $args)  {
-    $sql = "SELECT url,
-users.username,
-active.likes,
-playlists.title
-from active NATURAL JOIN users NATURAL JOIN library NATUAL JOIN playlists WHERE (active.playlist_id = :id AND playlists.playlist_id = :id)";
-    $query = $this->db->prepare($sql);
-    $query->bindParam("id", $args['id']);
-    $query->execute();
-    $result = $query->fetchAll();
-    return $response->withJSON($result);
-});
+$app->get('/playlist/[{id}]', function ($request, $response, $args) {
+        $pdo = $this->db;
+	$sth = $pdo->prepare('SELECT p.playlist_id, p.title, p.user_id,
+                                access_code, 
+                                FROM playlists as p INNER JOIN active as a
+                                ON p.playlist_id = a.playlist_id
+                                INNER JOIN library as l
+                                ON a.song_id = l.song_id WHERE p.playlist_id=:id');
+        $sth->bindParam("id", $args['id']);
+        $sth->execute();
+        $row = $sth->fetchObject();
+        return $this->response->withJson($row);
+    });
+
 $app->post('/guest/playlist', function ($request, $response, $args) {
 	$json = $request->getBody();
 	$data = json_decode($json, true);

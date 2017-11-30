@@ -91,18 +91,7 @@ $app->put('/changePassword', function(Request $request, Response $response, arra
     }
 });
 
-$app->get('/playlist/{id}', function(Request $request, Response $response, array $args)  {
-    $sql = "SELECT url,
-users.username,
-active.likes,
-playlists.title
-from active NATURAL JOIN users NATURAL JOIN library NATUAL JOIN playlists WHERE (active.playlist_id = :id AND playlists.playlist_id = :id)";
-    $query = $this->db->prepare($sql);
-    $query->bindParam("id", $args['id']);
-    $query->execute();
-    $result = $query->fetchAll();
-    return $response->withJSON($result);
-});
+
 
 
 

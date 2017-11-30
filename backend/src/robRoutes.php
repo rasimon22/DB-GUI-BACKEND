@@ -13,43 +13,35 @@ $app->get('/login', function (Request $request, Response $response, array $args)
     return $request;
 });
 
+
 $app->post('/login', function (Request $request, Response $response, array $args) {
-    $json = $request->getBody();
-    $mydata = json_decode($json,true);
-    $user_id = $mydata["user_id"];    
+    $json = $request->getBody();   
+    $mydata = json_decode($json,true);    
     $username = $mydata["username"];
     $pass = $mydata["password"];
-	if(!isset($username) || !isset($pass)){
-		$false = array('success' => false , 'error' => 'blank input');
-		$response = $response->withJSON(json_encode($false));
-		$response = $response->withRedirect('/login');
-		return $response;
-	}
-	echo "past blank check";
     $pass = md5($pass);
-      $sql = "SELECT count(*)
-            from users WHERE username = '$username' AND password = '$pass'";
-        $stmt = $this->db->query($sql);
-	$results = $stmt->fetch();
-        if($results['count(*)'] == 0){
-        	if(session_id() == ''){session_start();}
-        	$false = array('success' => false , 'error' => 'invalid login');
-                $response = $response->withJSON(json_encode($false));
-                $response = $response->withRedirect('/login');
-                return $response;
-        }
-	echo "past doesnt exist check";
-	 $sql = "SELECT user_id
-            from users WHERE username = '$username' AND password = '$pass'";
-        $stmt = $this->db->query($sql);
-	$results = [];
-        while($row = $stmt->fetch()) {
-            $results[] = $row;
-        }
-        $myJSON = json_encode(array($results));
-        $response = $response->withRedirect('/');       
-        $response = $response->withJSON($myJSON);
-    return $response;
+    //$pass = m$pass);	
+    $stmt = $this->db->prepare("SELECT user_id
+            from users WHERE username =:user AND password =:pass");
+	$stmt->bindParam('user', $username);
+	$stmt->bindParam('pass', $pass);
+	$stmt->execute();
+        $row = $stmt->fetchAll();
+	if ($row)
+	{
+		$getid = $this->db->prepare('SELECT user_id FROM users WHERE username=:user');
+		$getid->bindParam('user', $username);
+		$getid->execute();
+		$check = $getid->fetch(PDO::FETCH_ASSOC);
+		$uid = $check['user_id'];
+		$jsondata = json_encode(array('user_id' => $uid));
+		
+		$TOKEN = encodeJWT($jsondata);
+		$return = array("Token Created" => true, "TOKEN" => $TOKEN, "user_id" => $uid);
+		return $response->withJson($return);
+	}  
+	else
+    return $response->withStatus(401)->withRedirect('/login');
 });
 
 $app->get('/addvideos', function (Request $request, Response $response) {
