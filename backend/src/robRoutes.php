@@ -10,7 +10,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 $app->get('/login', function (Request $request, Response $response, array $args) {
         if(session_id() == ''){session_start();}
-    return $request;
+    return $response;
 });
 
 
@@ -92,7 +92,7 @@ $app->get('/active/{id}', function ( Request $request, Response $response, array
         }
         $JSON = array($results);
         $response = $response->withJSON($JSON);
-        $response = $response->withRedirect("/active/" + $active_id);
+        //$response = $response->withRedirect("/active/" + $active_id);
         return $response;
 });
 
