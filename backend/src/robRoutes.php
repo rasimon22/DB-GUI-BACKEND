@@ -101,20 +101,6 @@ $app->post('/active/{id}/like',  function ( Request $request, Response $response
         $mydata = json_decode($json,true);
         $active_id = (int)$args['id'];
         $user_id = $mydata["user_id"];
-        $sql = "SELECT access_code  FROM active INNER JOIN 
-                playlists ON active.playlist_id = playlists.playlist_id
-                 WHERE active_id = '$active_id';";
-        $stmt = $this->db->query($sql);
-        $sqlArray =  $stmt->fetch();
-        $access_code = implode($sqlArray);
-        $sql = "SELECT access_id FROM access
-        WHERE access_code = '$access_code'
-        AND user_id = '$user_id';";
-        $stmt1 = $this->db->query($sql);
-        $sqlArray = $stmt1->fetch();
-        $intArr = implode( $sqlArray);
-        $access_id = implode($sqlArray);
-
         $sql = "SELECT like_id FROM user_likes WHERE user_id = '$user_id' 
                 AND active_id = $active_id;";
         $stmt = $this->db->query($sql);
@@ -131,7 +117,7 @@ $app->post('/active/{id}/like',  function ( Request $request, Response $response
         $sql = "UPDATE active SET likes = likes + 1
                     WHERE active_id = '$active_id';";
         $this->db->query($sql);
-        $sql = "INSERT INTO user_likes (, user_id, active_id) VALUES 
+        $sql = "INSERT INTO user_likes ( user_id, active_id) VALUES 
                 ('$user_id','$active_id');";
         $this->db->query($sql);
         //$response = $response->withRedirect("/active/{id}");
@@ -144,24 +130,6 @@ $app->post('/active/{id}/dislike',  function ( Request $request, Response $respo
         $mydata = json_decode($json,true);
         $active_id = (int)$args['id'];
         $user_id = $mydata["user_id"];
-        $sql = "SELECT access_code  FROM active INNER JOIN 
-                playlists ON active.playlist_id = playlists.playlist_id
-                 WHERE active_id = '$active_id';";
-        $stmt = $this->db->query($sql);
-        $sqlArray =  $stmt->fetch();
-        $access_code = implode($sqlArray);
-        echo $access_code;
-        echo $user_id;
-        $sql = "SELECT access_id FROM access
-        WHERE access_code = '$access_code'
-        AND user_id = '$user_id';";
-        $stmt1 = $this->db->query($sql);
-        $sqlArray = $stmt1->fetch();
-        echo gettype($sqlArray);
-        $intArr = implode( $sqlArray);
-        echo $intArr;
-        $access_id = implode($sqlArray);
-        echo $access_id;
 
         $sql = "SELECT like_id FROM user_likes WHERE user_id = '$user_id' 
                 AND active_id = $active_id;";
@@ -269,7 +237,6 @@ $app->post('/playlist', function( Request $request, Response $response, array $a
 	$stmt = $this->db->prepare($sql);
 	$stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-	//$array = get_object_vars($row);
 	$plid = $row['playlist_id'];
 	$data = array('user_id' => $user_id, 'title' => $title, 'public' => $public, 'access_code' => $access_code, "playlist_id" => $plid);
 	$response = $response->withJSON($data);
