@@ -43,17 +43,15 @@ $app->post('/register', function (Request $request, Response $response, array $a
         $stmt = $this->db->query($sql);
         $results = $stmt->fetch();
         if($results['count(*)'] > 0){
-                if(session_id() == ''){session_start();}
                 $false = array('success' => false , 'error' => 'username taken');
                 $response = $response->withJSON(json_encode($false));
                 //$response = $response->withRedirect('/register');
                 return $response;
         }
     $returnData = $user->register($username, $pass, $fName, $lName, $email);
-<<<<<<< Updated upstream
-	$sql = $sql = "SELECT user_id
+	$sql = "SELECT user_id
             from users WHERE username = '$username' AND password = '$pass'";
-	 $stmt = $this->db->query($sql);
+	$stmt = $this->db->query($sql);
         $results = [];
         while($row = $stmt->fetch()) {
             $results[] = $row;
@@ -62,7 +60,7 @@ $app->post('/register', function (Request $request, Response $response, array $a
 	$response = $response->withJSON($myJSON);
 	return $response;
 });
-=======
+
     if($returnData["valid"] == true){
     return $response->withJson($returnData,200, JSON_UNESCAPED_UNICODE);
     }
@@ -70,8 +68,9 @@ $app->post('/register', function (Request $request, Response $response, array $a
 $app->get('/changePassword', function(Request $request, Response $response, array $args) {
     return $response->withStatus(200);
 }
->>>>>>> Stashed changes
-
+$app->get('/changePassword', function(Request $request, Response $response){
+    return $response->withStatus(200);
+}
 $app->put('/changePassword', function(Request $request, Response $response, array $args){
 //TODO: fix error handling from status 405 to status 418
     $json = $request->getBody();   
