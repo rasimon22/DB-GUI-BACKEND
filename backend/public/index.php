@@ -27,7 +27,7 @@ require __DIR__ . '/../src/middleware.php';
 // Register dynamic routes
 require __DIR__ . '/../src/routes.php';
 require __DIR__ . '/../src/robRoutes.php';
-require __DIR__ . '/../src/playlist.php'
+require __DIR__ . '/../src/playlist.php';
 require __DIR__ . '/../src/getsongs.php';
 require __DIR__ . '/../src/guest.php';
 
