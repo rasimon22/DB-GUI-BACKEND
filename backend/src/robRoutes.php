@@ -74,7 +74,7 @@ $app->post('/playlist/{id}/addvideos', function (Request $request, Response $res
 	$song_id = $results['song_id'];
 	$sql = "INSERT INTO active(user_id, song_id,playlist_id,likes) VALUES ('$user_id','$song_id','$playlist_id',0);";
         $stmt = $this->db->query($sql);
-	$JSON = json_encode(array("title" => $title, "link" => $link));
+	$JSON = array("title" => $title, "link" => $link);
         $response =  $response->withJSON($JSON);
        // $response =  $response->withRedirect("/");
         return $response;
@@ -90,7 +90,7 @@ $app->get('/active/{id}', function ( Request $request, Response $response, array
         while($row = $stmt->fetch()) {
             $results[] = $row;
         }
-        $JSON = json_encode(array($results));
+        $JSON = array($results);
         $response = $response->withJSON($JSON);
         $response = $response->withRedirect("/active/" + $active_id);
         return $response;
@@ -107,20 +107,15 @@ $app->post('/active/{id}/like',  function ( Request $request, Response $response
         $stmt = $this->db->query($sql);
         $sqlArray =  $stmt->fetch();
         $access_code = implode($sqlArray);
-        echo $access_code;
-        echo $user_id;
         $sql = "SELECT access_id FROM access
         WHERE access_code = '$access_code'
         AND user_id = '$user_id';";
         $stmt1 = $this->db->query($sql);
         $sqlArray = $stmt1->fetch();
-        echo gettype($sqlArray);
         $intArr = implode( $sqlArray);
-        echo $intArr;
         $access_id = implode($sqlArray);
-        echo $access_id;
 
-        $sql = "SELECT like_id FROM user_likes WHERE user_id = '$user_id' AND access_id = '$access_id' 
+        $sql = "SELECT like_id FROM user_likes WHERE user_id = '$user_id' 
                 AND active_id = $active_id;";
         $stmt = $this->db->query($sql);
         $results = [];
@@ -131,15 +126,13 @@ $app->post('/active/{id}/like',  function ( Request $request, Response $response
         if(count($results)> 0 ? true : false){
         //$response = $response->withRedirect("/active/");
         //might need to return some stuff JSON later
-        echo "here2";
         return  $response;
         }
-        echo "gets Here";
         $sql = "UPDATE active SET likes = likes + 1
                     WHERE active_id = '$active_id';";
         $this->db->query($sql);
-        $sql = "INSERT INTO user_likes (access_id, user_id, active_id) VALUES 
-                ('$access_id','$user_id','$active_id');";
+        $sql = "INSERT INTO user_likes (, user_id, active_id) VALUES 
+                ('$user_id','$active_id');";
         $this->db->query($sql);
         //$response = $response->withRedirect("/active/{id}");
         //might need to return some stuff JSON later*/
@@ -170,7 +163,7 @@ $app->post('/active/{id}/dislike',  function ( Request $request, Response $respo
         $access_id = implode($sqlArray);
         echo $access_id;
 
-        $sql = "SELECT like_id FROM user_likes WHERE user_id = '$user_id' AND access_id = '$access_id' 
+        $sql = "SELECT like_id FROM user_likes WHERE user_id = '$user_id' 
                 AND active_id = $active_id;";
         $stmt = $this->db->query($sql);
         $results = [];
@@ -186,8 +179,8 @@ $app->post('/active/{id}/dislike',  function ( Request $request, Response $respo
         $sql = "UPDATE active SET likes = likes - 1
                  WHERE active_id = '$active_id';";
         $this->db->query($sql);
-        $sql = "INSERT INTO user_likes (access_id, user_id, active_id) VALUES 
-                ('$access_id','$user_id','$active_id');";
+        $sql = "INSERT INTO user_likes ( user_id, active_id) VALUES 
+                ('$user_id','$active_id');";
         $this->db->query($sql);
         //$response = $response->withRedirect("/active/{id}");
         //might need to return some stuff JSON later
@@ -203,7 +196,7 @@ $app->get('/user/{id}', function( Request $request, Response $response, array $a
         while($row = $stmt->fetch()) {
                 $results[] = $row;
         }
-        $json = json_encode($results);
+        $json = $results;
         $response = $response->withJSON($json);
         return $response;
 });
@@ -220,7 +213,7 @@ $app->post('/user/{id}', function( Request $request, Response $response, array $
                 SET username = '$username', fName = '$fName', lName = '$lName', email = '$email'
                 WHERE user_id = '$user_id';";
         $this->db->query($sql);
-        $response = $response->withJSON($json);
+        $response = $response->withJSON($mydata);
 });
 
 //copied from stackoverflow: https://stackoverflow.com/questions/6101956/generating-a-random-password-in-php
@@ -267,8 +260,7 @@ $app->post('/playlist', function( Request $request, Response $response, array $a
 			$test = false;
         	}
 	}
-	echo $access_code;
-	/*$sql = "INSERT INTO playlists (title,user_id,access_code,public) 
+	$sql = "INSERT INTO playlists (title,user_id,access_code,isPublic) 
 		VALUES ('$title', '$user_id', '$access_code', '$public');";
 	$this->db->query($sql);
 	$sql = "INSERT INTO access (user_id, access_code) VALUES ('$user_id','$access_code');";
@@ -276,11 +268,13 @@ $app->post('/playlist', function( Request $request, Response $response, array $a
 	$sql = "SELECT playlist_id FROM playlists WHERE user_id = '$user_id' AND title = '$title' AND access_code = '$access_code';";
 	$stmt = $this->db->prepare($sql);
 	$stmt->execute();
-	$row = $stmt->fetchObject();
-	$data = array('user_id' => $user_id, 'title' => $title, 'public' => $public, 'access_code' => $access_code,'playlist_id' => $row);
-	$response = $response->withJSON(json_encode($data));
-	$response = $response->withRedirect('/playlist/' + $row);
-	return $response;*/      
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+	//$array = get_object_vars($row);
+	$plid = $row['playlist_id'];
+	$data = array('user_id' => $user_id, 'title' => $title, 'public' => $public, 'access_code' => $access_code, "playlist_id" => $plid);
+	$response = $response->withJSON($data);
+	//$response = $response->withRedirect('/playlist/' + $row);
+	return $response;      
 });
 
 
