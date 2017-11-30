@@ -31,15 +31,15 @@ $app->post('/guest', function (Request $request, Response $response, array $args
 	$stmt->bindParam('user', $username);
 	$stmt->bindParam('bool', $isGuest);
 	$stmt->execute();
-	$stmt1 = $this->db->prepare("SELECT user_id FROM users WHERE username=:user1");
-		$getid->bindParam('user1', $username);
-		$getid->execute();
-		$check = $getid->fetch(PDO::FETCH_ASSOC);
-		$uid = $check['user_id'];
-		$jsondata = json_encode(array('user_id' => $uid));
-		
-		$TOKEN = encodeJWT($jsondata);
-		$return = array("Token Created" => true, "TOKEN" => $TOKEN, "user_id" => $uid);
+	$getid = $this->db->prepare("SELECT user_id FROM users WHERE username=:user1");
+	$getid->bindParam('user1', $username);
+	$getid->execute();
+	$check = $getid->fetch(PDO::FETCH_ASSOC);
+	$uid = $check['user_id'];
+	$jsondata = json_encode(array('user_id' => $uid));
+	
+	$TOKEN = encodeJWT($jsondata);
+	$return = array("Token Created" => true, "TOKEN" => $TOKEN, "user_id" => $uid);
 		return $response->withJson($return);
 	}
 });

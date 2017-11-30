@@ -65,13 +65,11 @@ $app->post('/guest/playlist', function ($request, $response, $args) {
         }
        	}
 	$access_code = $gen;
-	$public = $data['isPublic'];
 	
-	$stmt = $this->db->prepare("INSERT INTO playlists(title, user_id, access_code, isPublic) VALUES (:title, :userid, :access_code, :public)");
+	$stmt = $this->db->prepare("INSERT INTO playlists(title, user_id, access_code, isPublic) VALUES (:title, :userid, :access_code)");
 	$stmt->bindParam('title', $title);
 	$stmt->bindParam('userid', $user_id);
 	$stmt->bindParam('access_code', $access_code);
-	$stmt->bindParam('public', $public);
 	$stmt->execute();
 	return $response->withStatus(200);
 	
