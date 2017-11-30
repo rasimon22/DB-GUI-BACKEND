@@ -52,12 +52,12 @@ class ClassUsers
 
         if($result) {
             return array( "valid" => true,
-			  "userID" => $user);
+			  "userName" => $user);
 			
 
         }
 	else{
-        return array("valid" => false, "userID" => "null"); 
+        return array("valid" => false, "userName" => "null"); 
 	}
     }
     

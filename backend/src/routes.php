@@ -50,6 +50,7 @@ $app->post('/register', function (Request $request, Response $response, array $a
                 return $response;
         }
     $returnData = $user->register($username, $pass, $fName, $lName, $email);
+<<<<<<< Updated upstream
 	$sql = $sql = "SELECT user_id
             from users WHERE username = '$username' AND password = '$pass'";
 	 $stmt = $this->db->query($sql);
@@ -61,6 +62,15 @@ $app->post('/register', function (Request $request, Response $response, array $a
 	$response = $response->withJSON($myJSON);
 	return $response;
 });
+=======
+    if($returnData["valid"] == true){
+    return $response->withJson($returnData,200, JSON_UNESCAPED_UNICODE);
+    }
+   });
+$app->get('/changePassword', function(Request $request, Response $response, array $args) {
+    return $response->withStatus(200);
+}
+>>>>>>> Stashed changes
 
 $app->put('/changePassword', function(Request $request, Response $response, array $args){
 //TODO: fix error handling from status 405 to status 418
@@ -76,7 +86,7 @@ $app->put('/changePassword', function(Request $request, Response $response, arra
         $stmt = $this->db->prepare($sql);
         $result = $stmt->execute(); 
         if($result){
-            $returnData = array("valid"=>true, "userID" => $user);
+            $returnData = array("userName" => $user);
             return $response->withJson($returnData,200, JSON_UNESCAPED_UNICODE);
         }
         else{
