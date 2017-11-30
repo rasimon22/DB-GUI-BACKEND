@@ -60,17 +60,11 @@ $app->post('/register', function (Request $request, Response $response, array $a
 	$response = $response->withJSON($myJSON);
 	return $response;
 });
-
-    if($returnData["valid"] == true){
-    return $response->withJson($returnData,200, JSON_UNESCAPED_UNICODE);
-    }
-   });
+   
 $app->get('/changePassword', function(Request $request, Response $response, array $args) {
     return $response->withStatus(200);
 }
-$app->get('/changePassword', function(Request $request, Response $response){
-    return $response->withStatus(200);
-}
+
 $app->put('/changePassword', function(Request $request, Response $response, array $args){
 //TODO: fix error handling from status 405 to status 418
     $json = $request->getBody();   
