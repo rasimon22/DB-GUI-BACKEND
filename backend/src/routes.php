@@ -63,7 +63,7 @@ $app->post('/register', function (Request $request, Response $response, array $a
    
 $app->get('/changePassword', function(Request $request, Response $response, array $args) {
     return $response->withStatus(200);
-}
+});
 
 $app->put('/changePassword', function(Request $request, Response $response, array $args){
 //TODO: fix error handling from status 405 to status 418

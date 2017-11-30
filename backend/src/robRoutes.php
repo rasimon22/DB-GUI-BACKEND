@@ -250,7 +250,7 @@ function randomCode() {
         return $access_code;
 }
 
-/*$app->post('/playlist', function( Request $request, Response $response, array $args){
+$app->post('/playlist', function( Request $request, Response $response, array $args){
 	$json = $request->getBody();
 	$mydata = json_decode($json,true);
 	$user_id = $mydata["user_id"];
@@ -280,8 +280,8 @@ function randomCode() {
 	$data = array('user_id' => $user_id, 'title' => $title, 'public' => $public, 'access_code' => $access_code,'playlist_id' => $row);
 	$response = $response->withJSON(json_encode($data));
 	$response = $response->withRedirect('/playlist/' + $row);
-	return $response;      
-});*/
+	return $response;*/      
+});
 
 
 
