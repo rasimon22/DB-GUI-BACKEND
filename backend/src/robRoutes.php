@@ -60,19 +60,33 @@ $app->get('/addvideos', function (Request $request, Response $response) {
         }
     return $response;
 });
-
-/*$app->post('/addvideos', function (Request $request, Response $response) {
+$app->post('/playlist/{id}/addvideos', function (Request $request, Response $response, array $args){
         $data = $request->getBody();
+	$playlist_id = (int)$args['id'];
         $data = json_decode($data,true);
         $title = $data["title"];
         $link = $data["link"];
-        $classvideoss = new ClassVideos($this->db);
-        $addvideo =  $classvideoss->AddNewVideo($title, $link);
-        $JSON = json_encode(array("title" => $title, "link" => $link));
+	$user_id = $data["user_id"];
+        //$classvideoss = new ClassVideos($this->db);
+        //$addvideo =  $classvideoss->AddNewVideo($title, $link);
+	$sql = "SELECT count(*) FROM  library WHERE url = '$link';";
+	$stmt = $this->db->query($sql);
+        $results = $stmt->fetch();
+        if($results['count(*)'] == 0){
+		$sql = "INSERT INTO library (url) VALUES ('$link');";
+		$stmt = $this->db->query($sql);
+	}
+	$sql = "SELECT song_id FROM library WHERE url = '$link';";
+	$stmt = $this->db->query($sql);
+	$results = $stmt->fetch();
+	$song_id = $results['song_id'];
+	$sql = "INSERT INTO active(user_id, song_id,playlist_id,likes) VALUES ('$user_id','$song_id','$playlist_id',0);";
+        $stmt = $this->db->query($sql);
+	$JSON = json_encode(array("title" => $title, "link" => $link));
         $response =  $response->withJSON($JSON);
-        $response =  $response->withRedirect("/");
+       // $response =  $response->withRedirect("/");
         return $response;
-});*/
+});
 
 $app->get('/active/{id}', function ( Request $request, Response $response, array $args) {
         $active_id = (int)$args['id'];
