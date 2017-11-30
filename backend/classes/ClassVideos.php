@@ -47,7 +47,7 @@ class ClassVideos
         return $results;
     }
 
-    public function AddNewVideo($title, $link) {
+	/*    public function AddNewVideo($title, $link) {
         //$sql = "INSERT INTO videos (title,link,votes) VALUES('$title','$link',0)";
 
         $sql = "insert into videos
@@ -77,7 +77,7 @@ class ClassVideos
 			}
 			return 'New Youtube Video has been added!';
 		
-    }
+    }*/
 
     public function VotesVideo($id, $votes) {
         //$sql = "UPDATE videos SET votes = $votes WHERE id = $id";
