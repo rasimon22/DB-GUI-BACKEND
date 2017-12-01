@@ -17,13 +17,8 @@ $app->get('/listusers', function (Request $request, Response $response, array $a
 	return $response->withJson($row);
 });
 $app->get('/login', function (Request $request, Response $response, array $args) {
-        if(session_id() == ''){session_start();}
-<<<<<<< Updated upstream
-    return $response;
-=======
 	$stuff = array("successfully" => true);
     return $response->withJSON($stuff);
->>>>>>> Stashed changes
 });
 
 
@@ -104,25 +99,13 @@ $app->get('/active/{id}', function ( Request $request, Response $response, array
         $active_id = $args['id'];
         $sql = "  SELECT library.url FROM library INNER JOIN
                 active ON library.song_id = active.song_id
-<<<<<<< Updated upstream
-                  WHERE active_id = $active_id;";
-        $stmt = $this->db->query($sql);
-              $results = [];
-        while($row = $stmt->fetch()) {
-            $results[] = $row;
-        }
-        $JSON = array($results);
-        $response = $response->withJSON($JSON);
-        //$response = $response->withRedirect("/active/" + $active_id);
-=======
-                  WHERE active_id =:acid";
+                 WHERE active_id =:acid";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam('acid', $active_id);      
 	$stmt->execute();
         $row = $stmt->fetchAll();
 	$array = array("url" => $row, "successfully" => true);
         $response = $response->withJson($array);
->>>>>>> Stashed changes
         return $response;
 });
 
