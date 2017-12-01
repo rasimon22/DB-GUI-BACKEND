@@ -23,7 +23,8 @@ $app->post('/guest', function (Request $request, Response $response, array $args
 	$isExist = $check->rowCount();
 	if ($isExist) {
 		//return $this->response->withStatus(401)->withHeader('Location', '/guest');
-		return $response->withStatus(401);
+		$data = array("successfully" => false);
+		return $response->withJson($data)->withStatus(401);
 	}
 	else
 	{

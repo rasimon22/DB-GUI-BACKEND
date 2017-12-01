@@ -1,3 +1,15 @@
+<IfModule mod_headers.c>
+# <FilesMatch "\.(ttf|ttc|otf|eot|woff|woff2|font.css|css|js)$">
+  Header always set Access-Control-Allow-Origin "*"
+   Header always set Access-Control-Allow-Methods "POST, GET, OPTIONS, DELETE, PUT"
+ Header always set Access-Control-Max-Age "1000"
+ Header always set Access-Control-Allow-Headers "x-requested-with, Content-Type, origin, authorization, accept, client-security-token"  
+#</FilesMatch>
+</IfModule>
+#Header always set Access-Control-Allow-Origin "*"
+#Header always set Access-Control-Allow-Methods "POST, GET, OPTIONS, DELETE, PUT"
+#Header always set Access-Control-Max-Age "1000"
+#Header always set Access-Control-Allow-Headers "x-requested-with, Content-Type, origin, authorization, accept, client-security-token"
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
@@ -9,6 +21,7 @@
   # work in environments without path prefix as well, providing a safe, one-size
   # fits all solution. But as you do not need it in this case, you can comment
   # the following 2 lines to eliminate the overhead.
+ RewriteCond %{REQUEST_METHOD} OPTIONS
   RewriteCond %{REQUEST_URI}::$1 ^(/.+)/(.*)::\2$
   RewriteRule ^(.*) - [E=BASE:%1]
   RewriteRule .* - [env=HTTP_AUTHORIZATION:%{HTTP:Authorization}]    

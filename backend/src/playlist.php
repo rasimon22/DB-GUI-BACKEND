@@ -19,19 +19,19 @@ $app->get('/user/playlist/[{uid}]', function (Request $request, Response $respon
 	$stmt->bindParam('uid1', $args['uid']);
 	$stmt->execute();
 	$row = $stmt->fetchAll();
+	$row['successfully'] = true;
 		return $this->response->withJson($row);
 });
 // Retrieve playlist with id 
 $app->get('/playlist/{id}', function(Request $request, Response $response, array $args)  {
-    $sql = "SELECT url,
-users.username,
-active.likes,
-playlists.title
-from active NATURAL JOIN users NATURAL JOIN library NATUAL JOIN playlists WHERE (active.playlist_id = :id AND playlists.playlist_id = :id)";
+    $sql = "SELECT url, users.username, active.likes, playlists.title 
+	    FROM active NATURAL JOIN users NATURAL JOIN library NATUAL JOIN playlists 
+	    WHERE (active.playlist_id = :id AND playlists.playlist_id = :id)";
     $query = $this->db->prepare($sql);
     $query->bindParam("id", $args['id']);
     $query->execute();
     $result = $query->fetchAll();
+    $result['successfully'] = true;
     return $response->withJSON($result);
 });
 $app->post('/guest/playlist', function ($request, $response, $args) {
@@ -66,12 +66,13 @@ $app->post('/guest/playlist', function ($request, $response, $args) {
        	}
 	$access_code = $gen;
 	
-	$stmt = $this->db->prepare("INSERT INTO playlists(title, user_id, access_code, isPublic) VALUES (:title, :userid, :access_code)");
+	$stmt = $this->db->prepare("INSERT INTO playlists(title, user_id, access_code) VALUES (:title, :userid, :access_code)");
 	$stmt->bindParam('title', $title);
 	$stmt->bindParam('userid', $user_id);
 	$stmt->bindParam('access_code', $access_code);
 	$stmt->execute();
-	return $response->withStatus(200);
+	$row = array("successfully" => true);
+	return $this->response->withJson($row);
 	
 });
 

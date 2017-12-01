@@ -19,6 +19,7 @@ $app->get('/songs', function (Request $request, Response $response, array $args)
 				FROM library as l NATURAL JOIN active as a');
 	$stmt->execute();
 	$row = $stmt->fetchAll();
+	$row['successfully'] = true;
 		return $this->response->withJson($row);
 });
 
@@ -31,7 +32,8 @@ $app->get('/songs/[{id}]', function (Request $request, Response $response, array
 				WHERE l.song_id=:id');
         $sth->bindParam("id", $args['id']);
         $sth->execute();
-        $row = $sth->fetchObject();
+        $row = $sth->fetchAll();
+	$row['successfully'] = true;
         return $this->response->withJson($row);
     });
 

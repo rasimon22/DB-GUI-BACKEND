@@ -10,7 +10,8 @@ require __DIR__ . '/../classes/ClassUsersLikeVideos.php';
 // Routes
 //homepage of the video
 $app->get('/', function (Request $request, Response $response, array $args) {
-    return $response->withStatus(200);
+    $res = array("successfully"=>true);
+    return $response->withJSON(json_encode($res));
 });
 
 $app->get('/logout', function (Request $request, Response $response, array $args) {
@@ -18,8 +19,8 @@ $app->get('/logout', function (Request $request, Response $response, array $args
 });
 
 $app->get('/register', function (Request $request, Response $response, array $args) {
-    #if(session_id() == ''){session_start();} 
-    return $response->withStatus(200);
+    $res = array("successfully"=>true);
+    return $response->withJSON(json_encode($res));
 });
 
 $app->post('/register', function (Request $request, Response $response, array $args) {
@@ -27,13 +28,13 @@ $app->post('/register', function (Request $request, Response $response, array $a
     $userData = json_decode($json,true);    
     $username = $userData["username"];
     $pass = $userData["password"];
-    $fName = $userData["firstName"];
-    $lName = $userData["lastName"];
+    $fName = $userData["username"];
+    $lName = $userData["username"];
     $email = $userData["email"];
     $user = new ClassUsers($this->db);
 	if($username == "" || $pass == "" || $fName == "" || $lName == "" || $email == ""){
-                $false = array('success' => false , 'error' => 'blank input');
-                $response = $response->withJSON(json_encode($false));
+                $false = array('successfully' => false , 'error' => 'blank input');
+                $response = $response->withJSON(json_encode($false))->withStatus(401);
                 //$response = $response->withRedirect('/register');
                 return $response;
        }
@@ -43,8 +44,8 @@ $app->post('/register', function (Request $request, Response $response, array $a
         $stmt = $this->db->query($sql);
         $results = $stmt->fetch();
         if($results['count(*)'] > 0){
-                $false = array('success' => false , 'error' => 'username taken');
-                $response = $response->withJSON(json_encode($false));
+                $false = array('successfully' => false , 'error' => 'username taken');
+                $response = $response->withJSON(json_encode($false))->withStatus(401);
                 //$response = $response->withRedirect('/register');
                 return $response;
         }
@@ -55,14 +56,16 @@ $app->post('/register', function (Request $request, Response $response, array $a
         $results = [];
         while($row = $stmt->fetch()) {
             $results[] = $row;
-        }
+        } 
+        $results["successfully"]=true;
         $myJSON = json_encode(array($results));
 	$response = $response->withJSON($myJSON);
 	return $response;
 });
    
 $app->get('/changePassword', function(Request $request, Response $response, array $args) {
-    return $response->withStatus(200);
+    $result = array("successfully"=> true);
+    return $response->withJSON(json_encode($result));
 });
 
 $app->put('/changePassword', function(Request $request, Response $response, array $args){
@@ -79,15 +82,17 @@ $app->put('/changePassword', function(Request $request, Response $response, arra
         $stmt = $this->db->prepare($sql);
         $result = $stmt->execute(); 
         if($result){
-            $returnData = array("userName" => $user);
+            $returnData = array("userName" => $user, "successfully"=>true,"newPassword" =>$pass);
             return $response->withJson($returnData,200, JSON_UNESCAPED_UNICODE);
         }
         else{
-            return $response->withStatus(418);  
+            $res = array("successfully" => false, "error"=>"database error");
+            return $response->withStatus(401)->withJSON($res);
         }
     }
     else{
-        return $response->withRedirect('/changePassword');
+        $res = array("sucessfully"=>false, "error"=>"invalid credentials");
+        return $response->withJSON($res)->withStatus(401);
     }
 });
 
